@@ -1,4 +1,4 @@
-package com.est.myapplication.boot;
+package org.marwane ;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -94,6 +94,7 @@ public class Boot {
 
         if (userChoices.size() == 2 && bootChoices.size() == 1) {
             int cell = bestAttackAndDefencePosition(bootChoices, userChoices);
+            System.out.println("the choised cell is : " + cell);
             if (cell != -1) {
                 setBootChoice(bootChoices, cell);
                 choice = cell;
@@ -119,17 +120,17 @@ public class Boot {
     }
 
     private int bestAttackPosition(List<Integer> bootChoices, List<Integer> userChoices, List<Integer> preferedCells) {
-        for (int corner : preferedCells) {
+        for (int cell : preferedCells) {
             List<Integer> simulatedBootChoices = new ArrayList<>();
             for (Integer choice : bootChoices) {
                 simulatedBootChoices.add(choice);
             }
-            simulatedBootChoices.add(corner);
+            simulatedBootChoices.add(cell);
             int combinationCount = checkBootWinningCombination(simulatedBootChoices, userChoices);
-            System.out.println("possible combinations for " + corner + " is " + combinationCount );
+            System.out.println("possible combinations for " + cell + " is " + combinationCount );
             if (combinationCount > 1) {
-                System.out.println("chooosed cell : " + corner);
-                return corner;
+                System.out.println("chooosed cell : " + cell);
+                return cell;
             }
 
         }
@@ -137,19 +138,44 @@ public class Boot {
         return preferedCells.get(0);
     }
 
+    private int bestStartingAttackPosition(List<Integer> bootChoices, List<Integer> userChoices, List<Integer> preferedCells) {
+        int perfectChoice = preferedCells.get(0);
+        int posiblities = 0;
+
+        for (int cell : preferedCells) {
+            List<Integer> simulatedBootChoices = new ArrayList<>();
+            for (Integer choice : bootChoices) {
+                simulatedBootChoices.add(choice);
+            }
+            simulatedBootChoices.add(cell);
+            int combinationCount = checkBootWinningCombination(simulatedBootChoices, userChoices);
+            System.out.println("possible combinations for " + cell + " is " + combinationCount );
+            if (combinationCount >= posiblities && !userChoices.contains(cell)) {
+                posiblities = combinationCount;
+                perfectChoice = cell;
+                System.out.println("chooosed cell : " + cell);
+            }
+
+        }
+
+        return perfectChoice;
+    }
+
+
+
     private int bestDefencePosition(List<Integer> bootChoices, List<Integer> userChoices, List<Integer> preferedCells) {
 
-        for (int corner : preferedCells) {
+        for (int cell : preferedCells) {
             List<Integer> simulatedUserChoices = new ArrayList<>();
 
             for (Integer choice : userChoices) {
                 simulatedUserChoices.add(choice);
             }
 
-            simulatedUserChoices.add(corner);
+            simulatedUserChoices.add(cell);
             int combinationCount = checkBootLoosingCombination(simulatedUserChoices, userChoices);
             if (combinationCount > 1)
-                return corner;
+                return cell;
         }
 
         return -1;
@@ -157,12 +183,25 @@ public class Boot {
 
     private int bestAttackAndDefencePosition(List<Integer> bootChoices, List<Integer> userChoices) {
 
-        int[] preferedCells = { 2, 4, 6, 8 };
+        List<Integer> preferedCells = new ArrayList<>();
 
-        for (int cell : preferedCells) {
-            if (!bootChoices.contains(cell) && !userChoices.contains(cell))
-                return cell;
+        preferedCells.add(2);
+        preferedCells.add(4);
+        preferedCells.add(6);
+        preferedCells.add(8);
+
+
+        for (Integer cell : preferedCells) {
+            if (!bootChoices.contains(cell) && !userChoices.contains(cell)) {
+                int attackPosition = bestStartingAttackPosition(bootChoices, userChoices, preferedCells);
+                if (attackPosition != -1) {
+                    System.out.println("this is the best cell : " + attackPosition);
+                    return attackPosition;
+                }
+
+            }
         }
+
         return -1;
 
 //        List<Integer> bestWinning = new ArrayList<>();
