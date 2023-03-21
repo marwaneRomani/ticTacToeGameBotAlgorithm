@@ -1,4 +1,4 @@
-package org.marwane;
+package com.est.myapplication.boot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -92,9 +92,19 @@ public class Boot {
         if (preferredCells.isEmpty())
             return;
 
+        if (userChoices.size() == 2 && bootChoices.size() == 1) {
+            int cell = bestAttackAndDefencePosition(bootChoices, userChoices);
+            if (cell != -1) {
+                setBootChoice(bootChoices, cell);
+                choice = cell;
+                System.out.println("boot defence and atack in cell :  " + cell);
+                return;
+            }
+        }
+
         int defencePosition = bestDefencePosition(bootChoices, userChoices, preferredCells);
 
-        if (defencePosition != -1 && userChoices.size() > 3) {
+        if (defencePosition != -1 && userChoices.size() >= 2) {
             setBootChoice(bootChoices, defencePosition);
             choice = defencePosition;
             System.out.println("Boot defending on " + defencePosition);
@@ -128,13 +138,14 @@ public class Boot {
     }
 
     private int bestDefencePosition(List<Integer> bootChoices, List<Integer> userChoices, List<Integer> preferedCells) {
-        List<Integer> simulatedUserChoices = new ArrayList<>();
-
-        for (Integer choice : userChoices) {
-            simulatedUserChoices.add(choice);
-        }
 
         for (int corner : preferedCells) {
+            List<Integer> simulatedUserChoices = new ArrayList<>();
+
+            for (Integer choice : userChoices) {
+                simulatedUserChoices.add(choice);
+            }
+
             simulatedUserChoices.add(corner);
             int combinationCount = checkBootLoosingCombination(simulatedUserChoices, userChoices);
             if (combinationCount > 1)
@@ -142,6 +153,55 @@ public class Boot {
         }
 
         return -1;
+    }
+
+    private int bestAttackAndDefencePosition(List<Integer> bootChoices, List<Integer> userChoices) {
+
+        int[] preferedCells = { 2, 4, 6, 8 };
+
+        for (int cell : preferedCells) {
+            if (!bootChoices.contains(cell) && !userChoices.contains(cell))
+                return cell;
+        }
+        return -1;
+
+//        List<Integer> bestWinning = new ArrayList<>();
+//        List<Integer> bestPreventLosing = new ArrayList<>();
+//
+//
+//        for (int cell : preferedCells) {
+//            List<Integer> simulatedBootChoices = new ArrayList<>();
+//
+//            for (Integer choice : userChoices) {
+//                simulatedBootChoices.add(choice);
+//            }
+//
+//            simulatedBootChoices.add(cell);
+//            int combinationCount = checkBootLoosingCombination(simulatedBootChoices, userChoices);
+//            if (combinationCount > 1)
+//                bestPreventLosing.add(cell);
+//        }
+//
+//        for (int cell : preferedCells) {
+//            List<Integer> simulatedBootChoices = new ArrayList<>();
+//
+//            for (Integer choice : userChoices) {
+//                simulatedBootChoices.add(choice);
+//            }
+//
+//
+//            simulatedBootChoices.add(cell);
+//            int combinationCount = checkBootWinningCombination(simulatedBootChoices, userChoices);
+//            if (combinationCount > 1)
+//                bestWinning.add(cell);
+//        }
+//
+//
+//        for (Integer cell : preferedCells)
+//            if (bestWinning.contains(cell) && bestPreventLosing.contains(cell))
+//                return cell;
+//
+//        return -1;
     }
 
 
@@ -185,7 +245,6 @@ public class Boot {
 
         return possibleLoosingCombination;
     }
-
 
 
 
